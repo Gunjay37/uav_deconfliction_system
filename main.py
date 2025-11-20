@@ -1,95 +1,85 @@
 """
-Main entry point for the UAV Deconfliction System.
+Main entry point for UAV Deconfliction System
 """
-import sys
-from src.utils.logger import get_logger
-from src.query.deconfliction_api import check_mission_conflicts, run_scenario
 
-logger = get_logger(__name__)
+import argparse
+from src.data.loader import (
+    load_missions,
+    load_simulated_flights,
+    load_test_scenarios
+)
+from src.query.deconfliction_api import (
+    check_mission_conflicts,
+    run_scenario
+)
+from src.visualization.plotter_2d import plot_2d_static
+# from src.visualization.plotter_2d import animate_2d  # If you want animation
 
 
 def main():
-    """Main system help message."""
-    logger.info("UAV Deconfliction System initialized")
-    print("\nUAV Deconfliction System")
-    print("Usage:")
-    print("  python main.py --test-load")
-    print("  python main.py --check <mission_id>")
-    print("  python main.py --scenario <scenario_id>")
-    print("Example:")
-    print("  python main.py --check mission_1")
-    print("  python main.py --scenario scenario_2\n")
 
+    parser = argparse.ArgumentParser(description="UAV Deconfliction System")
+    parser.add_argument("--mission", type=str, help="Run conflict check for a mission ID")
+    parser.add_argument("--scenario", type=str, help="Run a scenario from scenarios.json")
+    parser.add_argument("--visualize", action="store_true", help="Show 2D visualization")
+    parser.add_argument("--animate", action="store_true", help="Run animation")
+    args = parser.parse_args()
 
-# ------------ Existing Stage 2 Loader Test ------------
-def test_stage_2_loading():
-    """Temporary data loading test."""
-    from src.data.loader import (
-        load_missions,
-        load_simulated_flights,
-        load_test_scenarios
-    )
+    # =========================================================
+    # 1️⃣ RUN SCENARIO MODE
+    # =========================================================
+    if args.scenario:
+        result = run_scenario(
+            scenarios_path="data/scenarios.json",
+            missions_path="data/sample_missions.json",
+            flights_path="data/simulated_flights.json",
+            scenario_id=args.scenario
+        )
 
-    missions = load_missions("data/sample_missions.json")
-    flights = load_simulated_flights("data/simulated_flights.json")
-    scenarios = load_test_scenarios("data/scenarios.json")
+        print("\n--- Scenario Result ---")
+        print(result)
 
-    print("\n--- Missions Loaded ---")
-    for m in missions:
-        print(m)
+        # Visualization
+        if args.visualize:
+            missions = load_missions("data/sample_missions.json")
+            flights = load_simulated_flights("data/simulated_flights.json")
 
-    print("\n--- Simulated Flights Loaded ---")
-    for d in flights.drones:
-        print(d)
+            mission_id = result["raw_output"]["mission_id"]
+            mission = next(m for m in missions if m.mission_id == mission_id)
 
-    print("\n--- Scenarios Loaded ---")
-    for s in scenarios:
-        print(s)
+            plot_2d_static(mission, flights, conflicts=result["raw_output"]["conflicts"])
 
-    print("\n--- Segments (from first mission) ---")
-    print(missions[0].drone.to_segments())
-
-
-# ------------ New Stage 6 Handlers ------------
-def handle_args():
-    """Parse CLI arguments for Stage 6."""
-    args = sys.argv
-
-    # Keep Stage 2 test-load
-    if "--test-load" in args:
-        test_stage_2_loading()
         return
 
-    # Mission check
-    if "--check" in args:
-        idx = args.index("--check")
-        mission_id = args[idx + 1]
+    # =========================================================
+    # 2️⃣ RUN MISSION MODE
+    # =========================================================
+    if args.mission:
+        # Load mission & flights
+        missions = load_missions("data/sample_missions.json")
+        flights = load_simulated_flights("data/simulated_flights.json")
+
         result = check_mission_conflicts(
             missions_path="data/sample_missions.json",
             flights_path="data/simulated_flights.json",
-            mission_id=mission_id,
+            mission_id=args.mission
         )
-        print("\n--- Deconfliction Result ---")
+
+        print("\n--- Mission Check Result ---")
         print(result)
+
+        # Visualization
+        if args.visualize:
+            mission = next(m for m in missions if m.mission_id == args.mission)
+            plot_2d_static(mission, flights, conflicts=result["conflicts"])
+
         return
 
-    # Scenario execution
-    if "--scenario" in args:
-        idx = args.index("--scenario")
-        scenario_id = args[idx + 1]
-        result = run_scenario(
-            missions_path="data/sample_missions.json",
-            flights_path="data/simulated_flights.json",
-            scenarios_path="data/scenarios.json",
-            scenario_id=scenario_id,
-        )
-        print("\n--- Scenario Result ---")
-        print(result)
-        return
-
-    # Default help
-    main()
+    # If no args passed
+    print("Run with:")
+    print("  python main.py --scenario scenario_2 --visualize")
+    print("  python main.py --mission mission_2 --visualize")
 
 
 if __name__ == "__main__":
-    handle_args()
+    main()
