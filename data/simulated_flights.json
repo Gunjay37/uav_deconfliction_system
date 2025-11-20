@@ -1,0 +1,67 @@
+{
+  "flights": [
+    {
+      "id": "drone_a",
+      "name": "Drone A",
+      "description": "Simulated drone flying north-south corridor",
+      "waypoints": [
+        {
+          "id": 0,
+          "x": 50.0,
+          "y": 0.0,
+          "z": 10.0,
+          "timestamp": 0.0
+        },
+        {
+          "id": 1,
+          "x": 50.0,
+          "y": 100.0,
+          "z": 10.0,
+          "timestamp": 100.0
+        }
+      ]
+    },
+    {
+      "id": "drone_b",
+      "name": "Drone B",
+      "description": "Simulated drone flying east-west corridor",
+      "waypoints": [
+        {
+          "id": 0,
+          "x": 0.0,
+          "y": 50.0,
+          "z": 15.0,
+          "timestamp": 10.0
+        },
+        {
+          "id": 1,
+          "x": 100.0,
+          "y": 50.0,
+          "z": 15.0,
+          "timestamp": 60.0
+        }
+      ]
+    },
+    {
+      "id": "drone_c",
+      "name": "Drone C",
+      "description": "Simulated drone on diagonal path",
+      "waypoints": [
+        {
+          "id": 0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 20.0,
+          "timestamp": 0.0
+        },
+        {
+          "id": 1,
+          "x": 100.0,
+          "y": 100.0,
+          "z": 20.0,
+          "timestamp": 100.0
+        }
+      ]
+    }
+  ]
+}

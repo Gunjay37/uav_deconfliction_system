@@ -1,0 +1,33 @@
+{
+  "test_scenarios": [
+    {
+      "id": "scenario_1",
+      "name": "Conflict-Free Scenario",
+      "description": "Primary drone mission has no conflicts with any simulated flights",
+      "primary_mission_id": "mission_1",
+      "expected_result": "clear",
+      "expected_conflicts": 0
+    },
+    {
+      "id": "scenario_2",
+      "name": "Single Crossing Conflict",
+      "description": "Primary mission crosses Drone A's path at same altitude",
+      "primary_mission_id": "mission_2",
+      "expected_result": "conflict_detected",
+      "expected_conflicts": 1,
+      "conflict_details": {
+        "conflicting_drone": "drone_a",
+        "approximate_location": "x=50, y=50",
+        "approximate_time": 50.0
+      }
+    },
+    {
+      "id": "scenario_3",
+      "name": "Multiple Conflicts",
+      "description": "Primary mission conflicts with multiple simulated drones",
+      "primary_mission_id": "mission_1",
+      "expected_result": "conflict_detected",
+      "expected_conflicts": 2
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "system": {
+    "environment": "development",
+    "debug": true
+  },
+  "spatial": {
+    "safety_buffer_distance": 50.0,
+    "position_tolerance": 1.0,
+    "units": "meters"
+  },
+  "temporal": {
+    "time_step": 1.0,
+    "temporal_tolerance": 0.5,
+    "units": "seconds"
+  },
+  "visualization": {
+    "plot_dpi": 100,
+    "animation_fps": 10,
+    "show_plots": true,
+    "save_plots": true,
+    "output_directory": "output/"
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "logs/deconfliction.log",
+    "console_output": true
+  }
+}

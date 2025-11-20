@@ -1,0 +1,61 @@
+{
+  "missions": [
+    {
+      "id": "mission_1",
+      "name": "Conflict-Free Mission",
+      "description": "A simple waypoint mission with no conflicts",
+      "time_window": {
+        "start_time": 0.0,
+        "end_time": 100.0
+      },
+      "waypoints": [
+        {
+          "id": 0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 10.0,
+          "timestamp": 0.0
+        },
+        {
+          "id": 1,
+          "x": 100.0,
+          "y": 0.0,
+          "z": 10.0,
+          "timestamp": 50.0
+        },
+        {
+          "id": 2,
+          "x": 100.0,
+          "y": 100.0,
+          "z": 10.0,
+          "timestamp": 100.0
+        }
+      ]
+    },
+    {
+      "id": "mission_2",
+      "name": "Crossing Path Mission",
+      "description": "Mission that crosses another drone's path",
+      "time_window": {
+        "start_time": 0.0,
+        "end_time": 100.0
+      },
+      "waypoints": [
+        {
+          "id": 0,
+          "x": 0.0,
+          "y": 50.0,
+          "z": 15.0,
+          "timestamp": 0.0
+        },
+        {
+          "id": 1,
+          "x": 100.0,
+          "y": 50.0,
+          "z": 15.0,
+          "timestamp": 100.0
+        }
+      ]
+    }
+  ]
+}
