@@ -1,0 +1,25 @@
+# Core dependencies
+numpy==1.24.3
+matplotlib==3.7.1
+plotly==5.14.0
+scipy==1.10.1
+
+# Data handling
+pandas==2.0.2
+
+# Testing
+pytest==7.3.1
+pytest-cov==4.1.0
+
+# Development
+black==23.3.0
+flake8==6.0.0
+pylint==2.17.4
+
+# 3D visualization
+mayavi==4.8.1  # Optional, for advanced 3D
+
+# Video/Animation
+imageio==2.31.1
+
+# Note: json support is built-in to Python standard library
