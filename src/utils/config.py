@@ -12,7 +12,10 @@ class Config:
     # Temporal parameters
     TIME_STEP = 1.0  # seconds for interpolation
     TEMPORAL_TOLERANCE = 0.5  # seconds
-    
+
+    # Stage 5 sampling
+    NUM_SAMPLES = 50
+
     # Visualization
     PLOT_DPI = 100
     ANIMATION_FPS = 10

@@ -3,15 +3,25 @@ Main entry point for the UAV Deconfliction System.
 """
 import sys
 from src.utils.logger import get_logger
+from src.query.deconfliction_api import check_mission_conflicts, run_scenario
 
 logger = get_logger(__name__)
 
+
 def main():
-    """Main function."""
+    """Main system help message."""
     logger.info("UAV Deconfliction System initialized")
-    print("System ready. Run tests or examples to verify setup.")
+    print("\nUAV Deconfliction System")
+    print("Usage:")
+    print("  python main.py --test-load")
+    print("  python main.py --check <mission_id>")
+    print("  python main.py --scenario <scenario_id>")
+    print("Example:")
+    print("  python main.py --check mission_1")
+    print("  python main.py --scenario scenario_2\n")
 
 
+# ------------ Existing Stage 2 Loader Test ------------
 def test_stage_2_loading():
     """Temporary data loading test."""
     from src.data.loader import (
@@ -40,9 +50,46 @@ def test_stage_2_loading():
     print(missions[0].drone.to_segments())
 
 
-if __name__ == "__main__":
-    if "--test-load" in sys.argv:
-        test_stage_2_loading()
-    else:
-        main()
+# ------------ New Stage 6 Handlers ------------
+def handle_args():
+    """Parse CLI arguments for Stage 6."""
+    args = sys.argv
 
+    # Keep Stage 2 test-load
+    if "--test-load" in args:
+        test_stage_2_loading()
+        return
+
+    # Mission check
+    if "--check" in args:
+        idx = args.index("--check")
+        mission_id = args[idx + 1]
+        result = check_mission_conflicts(
+            missions_path="data/sample_missions.json",
+            flights_path="data/simulated_flights.json",
+            mission_id=mission_id,
+        )
+        print("\n--- Deconfliction Result ---")
+        print(result)
+        return
+
+    # Scenario execution
+    if "--scenario" in args:
+        idx = args.index("--scenario")
+        scenario_id = args[idx + 1]
+        result = run_scenario(
+            missions_path="data/sample_missions.json",
+            flights_path="data/simulated_flights.json",
+            scenarios_path="data/scenarios.json",
+            scenario_id=scenario_id,
+        )
+        print("\n--- Scenario Result ---")
+        print(result)
+        return
+
+    # Default help
+    main()
+
+
+if __name__ == "__main__":
+    handle_args()
