@@ -1,56 +1,143 @@
-# UAV Deconfliction System - Architecture
+# UAV Deconfliction System — Architecture
 
-## System Overview
+This document explains the internal structure and data flow of the UAV Deconfliction System. The system is designed using a **modular, layered architecture** inspired by professional UTM (Unmanned Traffic Management) pipelines.
 
-The system follows a layered architecture:
+---
 
-1. **Data Layer** (data/)
-   - Models: Define Waypoint, Drone, Mission structures
-   - Loader: Parse mission and flight schedule data
+# 🔧 High-Level Architecture
 
-2. **Core Engine** (core/)
-   - Spatial Checker: Detect spatial conflicts
-   - Temporal Checker: Detect temporal conflicts
-   - Conflict Resolver: Combine checks, generate reports
+```
+JSON → Models → Checkers → Resolver → API → Visualization
+```
 
-3. **Visualization Layer** (visualization/)
-   - 2D Plotter: Static/animated 2D visualizations
-   - 3D Plotter: 3D space + time visualizations
+### 1. **Input Layer**
+Reads mission and drone flight data from JSON.
 
-4. **Query Interface** (query/)
-   - Deconfliction API: Main interface for conflict checking
-   - Configuration management
+### 2. **Data Modeling Layer**
+Converts raw JSON into:
+- Waypoint  
+- Drone  
+- Mission  
+- FlightSchedule  
 
-## Key Design Decisions
+### 3. **Core Logic Layer**
+Handles the entire conflict detection process:
+- Spatial Checker  
+- Temporal Checker  
+- Spatiotemporal Conflict Resolver  
 
-### 1. Modular Separation
-- Each component handles one responsibility
-- Easy to test and maintain independently
-- Facilitates parallel development
+### 4. **Query API Layer**
+Provides simple, high-level functions:
+- `check_mission_conflicts()`
+- `run_scenario()`
 
-### 2. Data Flow
-Primary Mission → Query API → Spatial Check → Temporal Check → Conflict Report
+### 5. **Visualization Layer**
+Generates:
+- 2D static + animated plots  
+- 3D static  
+- 4D animated  
 
-### 3. Scalability Considerations
-- Use efficient spatial indexing (KD-trees) in future
-- Time-series optimized data structures
-- Support for batch processing of multiple missions
+---
 
-### 4. Safety Margins
-- Configurable buffer distances
-- Adjustable temporal margins
-- Extensible conflict classification
+# 📁 Module Breakdown
 
-## Technology Choices
+## 1. `src/data/`
+### `models.py`
+Defines core data classes:
+- `Waypoint`
+- `Drone`
+- `Mission`
+- `FlightSchedule`
 
-- **NumPy/SciPy**: Efficient numerical computations
-- **Matplotlib/Plotly**: Visualization (Plotly for interactivity)
-- **Pytest**: Comprehensive testing framework
-- **Python 3.9+**: Modern language features, type hints
+### `loader.py`
+Loads missions, simulated flights, scenarios from JSON.  
+Ensures validation and correct formatting.
 
-## Extension Points
+---
 
-- Custom conflict resolution strategies
-- Real-time data ingestion pipelines
-- Database integration
-- Distributed computing (Dask, Ray)
+## 2. `src/core/`
+This layer performs all conflict calculations.
+
+### `spatial_checker.py`
+- Computes distances between trajectory segments  
+- Evaluates safety buffer  
+- Detects path intersections  
+
+### `temporal_checker.py`
+- Interpolates drone positions using timestamps  
+- Detects timing overlaps  
+- Calculates closest approach times  
+
+### `conflict_resolver.py`
+- Runs spatial + temporal checks together  
+- Samples time steps  
+- Reports:
+  - conflict time  
+  - location (x,y,z)  
+  - min distance  
+  - conflicting drone ID  
+
+---
+
+## 3. `src/query/deconfliction_api.py`
+High-level user-facing API:
+- Loads data  
+- Calls conflict resolver  
+- Formats output  
+- Used by `main.py`
+
+---
+
+## 4. `src/utils/`
+### `config.py`
+Defines system-wide settings such as:
+- Safety buffer  
+- Time step  
+- Debug level  
+
+### `logger.py`
+Handles unified logging.
+
+### `random_flights.py`
+Generates randomized flights for dynamic airspace simulations.
+
+---
+
+## 5. `src/visualization/`
+### `plotter_2d.py`
+- Static 2D plot  
+- Animated 2D visualization  
+
+### `plotter_3d.py`
+- Static 3D  
+- Animated 3D (4D)  
+
+---
+
+# 🔄 Data Flow Diagram
+
+```
+load_missions()           load_simulated_flights()
+       │                               │
+       ▼                               ▼
+    Mission ---------------------> FlightSchedule
+       │                               │
+       └──────► conflict_resolver ◄────┘
+                       │
+                       ▼
+                Conflict Reports
+                       │
+                       ▼
+         (2D/3D/4D Visualization Modules)
+```
+
+---
+
+## 🧩 Why This Architecture Works Well
+- **Clear separation of responsibilities**  
+- **Each module can be replaced/extended independently**  
+- **Easy debugging and testing**  
+- **Scalable for larger airspace**  
+- **Professional structure used in robotics/UTM systems**
+
+---

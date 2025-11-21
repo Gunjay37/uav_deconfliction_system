@@ -1,76 +1,114 @@
-# UAV Strategic Deconfliction System
+# UAV Deconfliction System  
+*A Modular, Visual, and Scalable Airspace Conflict Detection Engine*
 
-A Python-based system for detecting and analyzing conflicts between drone missions in shared airspace.
+## 🚀 Overview
+This project implements a **UAV Deconfliction System** capable of detecting **spatial**, **temporal**, and **spatiotemporal** conflicts between unmanned aerial vehicles (UAVs) operating in the same airspace. It includes:
 
-## Quick Start
+- Dynamic airspace simulation with random drone flights  
+- Spatial, temporal, and combined conflict detection  
+- 2D (static + animated), 3D static, and 4D (3D + time) visualization  
+- Scenario evaluation engine  
+- Modular architecture suitable for scaling to larger UTM systems  
 
-### Prerequisites
-- Python 3.9+
-- pip/conda
-- Git
+The system is built with clean structuring, testability, and clarity in mind.
 
-### Installation
+---
 
-1. Clone the repository:
-   \`\`\`bash
-   git clone https://github.com/yourusername/uav-deconfliction-system.git
-   cd uav-deconfliction-system
-   \`\`\`
+## ⭐ Features
 
-2. Create virtual environment:
-   \`\`\`bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\\Scripts\\activate
-   \`\`\`
+### ✔ **Spatial Conflict Detection**
+Computes minimum distances between flight paths, safety buffer infringements, and trajectory intersection events.
 
-3. Install dependencies:
-   \`\`\`bash
-   pip install -r requirements.txt
-   \`\`\`
+### ✔ **Temporal Conflict Detection**
+Interpolates drone positions over time to identify overlaps in time windows.
 
-4. Run tests:
-   \`\`\`bash
-   pytest tests/ -v
-   \`\`\`
+### ✔ **Spatiotemporal Analysis**
+Samples full mission timelines using configurable time steps to identify real collision risks.
 
-5. Run example scenarios:
-   \`\`\`bash
-   python examples/scenario_1_conflict_free.py
-   \`\`\`
+### ✔ **Dynamic Random Airspace**
+Generates 5+ random drone flights every run for stress-testing.
 
-## Usage
+### ✔ **Multi-Layer Visualization**
+- **2D Static Plot:** Top-down paths + conflict markers  
+- **2D Animation:** Real-time movement  
+- **3D Static Plot:** Altitude representation  
+- **4D Animation:** Full 3D + time visualization  
 
-Basic query:
-\`\`\`python
-from src.query.deconfliction_api import DeconflictionService
+### ✔ **Scenario Evaluation**
+Runs predefined UTM conflict scenarios with expected and actual outcomes.
 
-service = DeconflictionService()
-result = service.check_mission(primary_mission, simulated_flights)
-print(result)
-\`\`\`
+### ✔ **Clean Architecture**
+Modular structure under `src/` for clarity, reuse, and extensibility.
 
-## Project Structure
+---
 
-See ARCHITECTURE.md for detailed system design.
+## 📂 Project Structure
 
-## Documentation
+```
+uav-deconfliction-system/
+├── src/
+│   ├── data/                # Models + JSON loaders
+│   ├── core/                # Spatial, temporal, spatiotemporal logic
+│   ├── visualization/       # 2D, 3D, 4D plots + animations
+│   ├── query/               # API for scenario/mission checks
+│   └── utils/               # Config, logging, random flights
+├── data/                    # sample_missions, simulated_flights, scenarios
+├── examples/                # example runner scripts
+├── docs/                    # Stage 10 documentation
+├── tests/                   # pytest suite
+└── main.py                  # unified runner
+```
 
-- ARCHITECTURE.md - System design and components
-- DESIGN_DECISIONS.md - Rationale for architectural choices
-- SCALABILITY.md - Discussion of real-world deployment
+---
 
-## Testing
+## 🛠 Installation
 
-Run tests with coverage:
-\`\`\`bash
-pytest tests/ --cov=src --cov-report=html
-\`\`\`
+```bash
+git clone <your-repo-url>
+cd uav-deconfliction-system
+python -m venv venv
+venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+```
 
-## Features
+---
 
-- ✅ Spatial conflict detection
-- ✅ Temporal conflict detection
-- ✅ Detailed conflict reporting
-- ✅ 2D visualization
-- ✅ 3D/4D visualization (extra credit)
-- 🚧 Scalability for 10k+ drones
+## ▶️ How to Run
+
+### **Mission Mode**
+```
+python main.py --mission mission_2 --visualize_all
+```
+
+### **Scenario Mode**
+```
+python main.py --scenario scenario_2 --visualize_all
+```
+
+### **Dynamic Random Airspace (recommended demo)**
+```
+python main.py --dynamic --visualize_all
+```
+
+### **Only 2D visualization**
+```
+python main.py --mission mission_2 --visualize
+```
+
+---
+
+## 📸 Visualizations Included
+
+- 2D static “dashboard”
+- 2D animation of UAVs over time  
+- 3D static trajectories (altitude included)  
+- 4D time-based animation in 3D space  
+
+---
+
+## 👨‍💻 Author
+**Gunjay Chitr Suhalka**  
+Robotics & Automation Engineer  
+
+---
+
