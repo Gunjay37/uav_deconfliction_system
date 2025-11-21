@@ -1,114 +1,112 @@
 # UAV Deconfliction System  
-*A Modular, Visual, and Scalable Airspace Conflict Detection Engine*
-
-## 🚀 Overview
-This project implements a **UAV Deconfliction System** capable of detecting **spatial**, **temporal**, and **spatiotemporal** conflicts between unmanned aerial vehicles (UAVs) operating in the same airspace. It includes:
-
-- Dynamic airspace simulation with random drone flights  
-- Spatial, temporal, and combined conflict detection  
-- 2D (static + animated), 3D static, and 4D (3D + time) visualization  
-- Scenario evaluation engine  
-- Modular architecture suitable for scaling to larger UTM systems  
-
-The system is built with clean structuring, testability, and clarity in mind.
+### Multi-Drone Spatiotemporal Conflict Detection, Resolution & Visualization Suite  
+**Author:** Gunjay Chitr Suhalka  
+**Domain:** UAV Traffic Management (UTM), Airspace Safety, Autonomous Robotics  
+**Version:** 1.0 – 2025
 
 ---
 
-## ⭐ Features
+## 1. Overview
 
-### ✔ **Spatial Conflict Detection**
-Computes minimum distances between flight paths, safety buffer infringements, and trajectory intersection events.
+The **UAV Deconfliction System** is a complete, modular, and scalable framework for detecting and visualizing **spatial**, **temporal**, and **spatiotemporal** conflicts between multiple unmanned aerial vehicles operating within shared airspace.  
 
-### ✔ **Temporal Conflict Detection**
-Interpolates drone positions over time to identify overlaps in time windows.
+The system integrates:
 
-### ✔ **Spatiotemporal Analysis**
-Samples full mission timelines using configurable time steps to identify real collision risks.
+- High-fidelity geometric modeling of UAV trajectories  
+- Time-indexed interpolation for continuous position estimation  
+- Spatial + temporal rule-based conflict evaluation  
+- Dynamic airspace simulation with randomized drone traffic  
+- Multi-layer visualization:
+  - **2D static analysis**
+  - **2D continuous-time animation**
+  - **3D static trajectory visualization**
+  - **4D (3D + time) animated visualization**
+- Scenario-based validation and mission-based conflict assessment  
+- Clean architecture aligned with professional aerospace software practices
 
-### ✔ **Dynamic Random Airspace**
-Generates 5+ random drone flights every run for stress-testing.
-
-### ✔ **Multi-Layer Visualization**
-- **2D Static Plot:** Top-down paths + conflict markers  
-- **2D Animation:** Real-time movement  
-- **3D Static Plot:** Altitude representation  
-- **4D Animation:** Full 3D + time visualization  
-
-### ✔ **Scenario Evaluation**
-Runs predefined UTM conflict scenarios with expected and actual outcomes.
-
-### ✔ **Clean Architecture**
-Modular structure under `src/` for clarity, reuse, and extensibility.
+This project demonstrates engineering rigor, modular design thinking, and real-world UTM applicability.
 
 ---
 
-## 📂 Project Structure
+## 2. Key Features
 
-```
+### ✔ Spatial Conflict Detection  
+- Computes continuous minimum distance between UAV trajectory segments  
+- Supports configurable safety buffer (default 50m)
+
+### ✔ Temporal Conflict Detection  
+- Time-window analysis using mission timestamps  
+- Linear interpolation to estimate UAV position at sub-second resolution
+
+### ✔ Spatiotemporal Conflict Fusion  
+- Combines spatial and temporal constraints  
+- Produces interpretable conflict reports:
+  - Closest approach location (x, y, z)
+  - Time of violation
+  - Minimum separation
+
+### ✔ Dynamic Airspace Simulation  
+- Automatically generates randomized drone trajectories  
+- Produces non-deterministic, realistic airspace encounters  
+- Helps test robustness under varying densities
+
+### ✔ Multi-Layer Visualization Suite  
+- **2D Top-Down Static View**
+- **2D Animated Trajectories**
+- **3D Spatial Visualization**
+- **4D Animated Temporal-Spatial Evolution**
+
+### ✔ Scenario Evaluator  
+- Reads scenarios from `scenarios.json`  
+- Validates expected vs. actual outcomes  
+- Outputs conflict summaries
+
+---
+
+## 3. Architecture Summary
+
 uav-deconfliction-system/
+│
 ├── src/
-│   ├── data/                # Models + JSON loaders
-│   ├── core/                # Spatial, temporal, spatiotemporal logic
-│   ├── visualization/       # 2D, 3D, 4D plots + animations
-│   ├── query/               # API for scenario/mission checks
-│   └── utils/               # Config, logging, random flights
-├── data/                    # sample_missions, simulated_flights, scenarios
-├── examples/                # example runner scripts
-├── docs/                    # Stage 10 documentation
-├── tests/                   # pytest suite
-└── main.py                  # unified runner
-```
+│ ├── data/ # Data models & loaders
+│ ├── core/ # Spatial, temporal & fusion logic
+│ ├── query/ # API-level interface
+│ ├── visualization/ # 2D, 3D, 4D visualization modules
+│ ├── utils/ # Config, logger, random generators
+│ └── tests/ # Unit & integration tests
+│
+├── data/ # Mission, flights, scenario JSON files
+├── examples/ # Scenario scripts & demos
+└── main.py # Entrypoint for all modes
 
----
+## 4. Installation
 
-## 🛠 Installation
-
-```bash
-git clone <your-repo-url>
+git clone https://github.com/<your-repo>/uav-deconfliction-system
 cd uav-deconfliction-system
 python -m venv venv
 venv\Scripts\activate  # Windows
 pip install -r requirements.txt
-```
 
----
+## 5. Usage
+### 1. Run a mission conflict check
+- python main.py --mission mission_2 --visualize_all
+### 2. Run a predefined scenario
+- python main.py --scenario scenario_2 --visualize_all
+### 3. Dynamic airspace simulation
+- python main.py --dynamic --visualize_all
 
-## ▶️ How to Run
+## 6. Requirements
 
-### **Mission Mode**
-```
-python main.py --mission mission_2 --visualize_all
-```
+Python 3.9+
 
-### **Scenario Mode**
-```
-python main.py --scenario scenario_2 --visualize_all
-```
+NumPy
 
-### **Dynamic Random Airspace (recommended demo)**
-```
-python main.py --dynamic --visualize_all
-```
+Matplotlib
 
-### **Only 2D visualization**
-```
-python main.py --mission mission_2 --visualize
-```
+Pillow
 
----
+## 7. Author
 
-## 📸 Visualizations Included
-
-- 2D static “dashboard”
-- 2D animation of UAVs over time  
-- 3D static trajectories (altitude included)  
-- 4D time-based animation in 3D space  
-
----
-
-## 👨‍💻 Author
-**Gunjay Chitr Suhalka**  
-Robotics & Automation Engineer  
-
----
-
+Gunjay Chitr Suhalka
+Robotics & Automation Engineer
+Specialization in autonomous systems, CV pipelines, UAV trajectory modeling, and ROS-based navigation.

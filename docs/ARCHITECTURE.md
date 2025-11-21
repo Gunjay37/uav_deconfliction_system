@@ -1,143 +1,174 @@
-# UAV Deconfliction System — Architecture
-
-This document explains the internal structure and data flow of the UAV Deconfliction System. The system is designed using a **modular, layered architecture** inspired by professional UTM (Unmanned Traffic Management) pipelines.
-
----
-
-# 🔧 High-Level Architecture
-
-```
-JSON → Models → Checkers → Resolver → API → Visualization
-```
-
-### 1. **Input Layer**
-Reads mission and drone flight data from JSON.
-
-### 2. **Data Modeling Layer**
-Converts raw JSON into:
-- Waypoint  
-- Drone  
-- Mission  
-- FlightSchedule  
-
-### 3. **Core Logic Layer**
-Handles the entire conflict detection process:
-- Spatial Checker  
-- Temporal Checker  
-- Spatiotemporal Conflict Resolver  
-
-### 4. **Query API Layer**
-Provides simple, high-level functions:
-- `check_mission_conflicts()`
-- `run_scenario()`
-
-### 5. **Visualization Layer**
-Generates:
-- 2D static + animated plots  
-- 3D static  
-- 4D animated  
+# System Architecture  
+### UAV Deconfliction System — Engineering Architecture Specification  
+**Version:** 1.0  
+**Author:** Gunjay Chitr Suhalka
 
 ---
 
-# 📁 Module Breakdown
+## 1. Introduction
 
-## 1. `src/data/`
-### `models.py`
-Defines core data classes:
-- `Waypoint`
-- `Drone`
-- `Mission`
-- `FlightSchedule`
+This document describes the full architecture of the **UAV Deconfliction System**, including module responsibilities, data flow, subsystem interactions, and the underlying engineering principles.
 
-### `loader.py`
-Loads missions, simulated flights, scenarios from JSON.  
-Ensures validation and correct formatting.
+The system is designed following **modular, layered, and testable software engineering practices**, commonly used in aerospace autonomy and UTM software.
 
 ---
 
-## 2. `src/core/`
-This layer performs all conflict calculations.
+## 2. High-Level Architecture
 
-### `spatial_checker.py`
-- Computes distances between trajectory segments  
-- Evaluates safety buffer  
-- Detects path intersections  
+The system is composed of **five primary subsystems**:
 
-### `temporal_checker.py`
-- Interpolates drone positions using timestamps  
-- Detects timing overlaps  
-- Calculates closest approach times  
-
-### `conflict_resolver.py`
-- Runs spatial + temporal checks together  
-- Samples time steps  
-- Reports:
-  - conflict time  
-  - location (x,y,z)  
-  - min distance  
-  - conflicting drone ID  
+1. **Data Layer** – models for UAVs, missions, and waypoints  
+2. **Core Conflict Detection Layer** – spatial, temporal, and fused logic  
+3. **Query / Interface Layer** – user-facing API  
+4. **Visualization Layer** – 2D/3D/4D representation of results  
+5. **Utility Layer** – logging, configuration, random traffic generation  
 
 ---
 
-## 3. `src/query/deconfliction_api.py`
-High-level user-facing API:
-- Loads data  
-- Calls conflict resolver  
-- Formats output  
-- Used by `main.py`
+## 3. Architecture Diagram
+
+pgsql
+Copy code
+            ┌─────────────────────────────┐
+            │        JSON Data Files       │
+            │ missions / flights / scenarios│
+            └───────────────┬─────────────┘
+                            │
+                    Data Loaders
+                            │
+                            ▼
+            ┌─────────────────────────────┐
+            │        Data Models           │
+            │ Waypoint, Drone, Mission     │
+            └───────────────┬─────────────┘
+                            │
+                    Core Conflict Engine
+                            │
+    ┌────────────────────────┼────────────────────────┐
+    ▼                        ▼                        ▼
+Spatial Checker      Temporal Checker     Spatiotemporal Resolver
+(d(x,y,z))          (t, interpolation)      (fusion engine)
+└────────────────────────┼────────────────────────┘
+                         │
+                         ▼
+         ┌─────────────────────────────┐
+         │ Query API Layer │
+         │ check_mission_conflicts() │
+         └─────────────────────────────┘
+                         │
+                         ▼
+               Visualization Layer
+(2D, 2D Animation, 3D Static, 4D Animated Visualization)
+
+## 4. Subsystem Details
+
+### 4.1 Data Layer (src/data)
+Models:
+
+- **Waypoint**: (x, y, z, t)
+- **Drone**: drone_id, waypoints
+- **Mission**: mission_id, drone, time_window
+
+Loaders:
+
+- `load_missions()`
+- `load_simulated_flights()`
+- `load_test_scenarios()`
 
 ---
 
-## 4. `src/utils/`
-### `config.py`
-Defines system-wide settings such as:
-- Safety buffer  
-- Time step  
-- Debug level  
+### 4.2 Spatial Checker (src/core/spatial_checker.py)
+Responsibilities:
 
-### `logger.py`
-Handles unified logging.
+- Compute Euclidean distance between moving UAVs  
+- Compute segment-to-segment minimum approach  
+- Enforce **safety buffer rule**  
+- Return instantaneous spatial conflicts
 
-### `random_flights.py`
-Generates randomized flights for dynamic airspace simulations.
+Complexity: *O(N·M)* where N, M are number of segments.
 
 ---
 
-## 5. `src/visualization/`
-### `plotter_2d.py`
-- Static 2D plot  
-- Animated 2D visualization  
+### 4.3 Temporal Checker (src/core/temporal_checker.py)
+Responsibilities:
 
-### `plotter_3d.py`
-- Static 3D  
-- Animated 3D (4D)  
-
----
-
-# 🔄 Data Flow Diagram
-
-```
-load_missions()           load_simulated_flights()
-       │                               │
-       ▼                               ▼
-    Mission ---------------------> FlightSchedule
-       │                               │
-       └──────► conflict_resolver ◄────┘
-                       │
-                       ▼
-                Conflict Reports
-                       │
-                       ▼
-         (2D/3D/4D Visualization Modules)
-```
+- Evaluate mission time windows  
+- Identify overlapping intervals  
+- Perform interpolation across timestamps  
+- Produce time-indexed trajectories
 
 ---
 
-## 🧩 Why This Architecture Works Well
-- **Clear separation of responsibilities**  
-- **Each module can be replaced/extended independently**  
-- **Easy debugging and testing**  
-- **Scalable for larger airspace**  
-- **Professional structure used in robotics/UTM systems**
+### 4.4 Spatiotemporal Conflict Resolver  
+Combines:
+
+- Spatial separation constraints  
+- Temporal overlap  
+- Minimum-distance sampling  
+
+Provides:
+
+- Conflict list  
+- Closest approach metrics  
+- Conflict timing  
+- Conflict severity
 
 ---
+
+### 4.5 Visualization Layer  
+Modules:
+
+- **2D static plotter**
+- **2D animated trajectory**
+- **3D static visualization**
+- **4D animated visualization (3D + time)**
+
+Responsibilities:
+
+- Render conflicts  
+- Show multi-drone interaction  
+- Provide interpretable view of conflict evolution
+
+---
+
+### 4.6 Query Layer  
+Single entrypoint:
+
+check_mission_conflicts()
+
+Provides a clean interface for:
+
+- Loading missions  
+- Running conflict detection  
+- Returning structured outputs  
+
+---
+
+## 5. Testing Architecture
+
+Tests include:
+
+- Spatial checker unit tests  
+- Temporal checker unit tests  
+- Fusion / resolver tests  
+- End-to-end integration tests  
+- Scenario validation tests  
+
+Testing framework: **pytest**
+
+---
+
+## 6. Engineering Principles Used
+
+- Separation of concerns  
+- Pure functions for core logic  
+- Deterministic outputs for scenario testing  
+- High-cohesion, low-coupling module design  
+- Configurable safety parameters  
+- Extensible visualization layer  
+
+---
+
+## 7. Conclusion
+
+The system architecture is robust, extensible, and aligned with aerospace-grade modularity. It enables accurate detection of multi-UAV conflicts and supports future extensions such as ROS2 integration, probabilistic trajectories, and large-scale UTM simulations.

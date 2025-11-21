@@ -1,91 +1,96 @@
-# UAV Deconfliction System — Scalability & Future Extensions
-
-This document explains how the system scales today and how it can grow into a full UTM architecture.
-
----
-
-# 🚀 Current Scalability Strengths
-
-### ✔ Modular pipeline (core, data, query, visualization)  
-Easily supports new algorithms (e.g., clustering, KD-trees).
-
-### ✔ Linear interpolation  
-Fast enough for dozens of drones.
-
-### ✔ Sampling-based detection  
-Tunable resolution for performance vs accuracy.
-
-### ✔ Configurable parameters  
-- Time step  
-- Safety buffer  
-- Animation FPS  
+# Scalability Analysis  
+### UAV Deconfliction System  
 
 ---
 
-# 📈 Scaling to 100+ Drones
+## 1. Overview
 
-### 1. **Vectorized Computation**
-Use NumPy for batch distance calculations:
-- All drones vs all drones  
-- All sample times at once  
-
-### 2. **Spatial Acceleration Structures**
-Integrate:
-- KD-trees  
-- R-trees  
-- Vantage-point trees  
-
-To skip unnecessary distance checks.
-
-### 3. **Parallelization**
-Use:
-- multiprocessing  
-- concurrent futures  
-- JAX/PyTorch (tensor-based ops)  
-
-To compute full timesteps in parallel.
+This document analyzes how the system scales in terms of performance, architecture, and airspace complexity.
 
 ---
 
-# ⚡ Real-Time Scaling (1000+ Drones)
+## 2. Current System Complexity
 
-A real UTM system requires streaming telemetry.
+### Spatial checker:  
+O(N · M) comparisons for N and M segments
 
-### Future additions:
-- ROS2 real-time topics  
-- ZeroMQ message bus  
-- Websocket data ingestion  
-- Async event loops  
+### Temporal checker:  
+O(K) interpolation per sample
 
-### Database backend:
-- InfluxDB / Timescale for time-series trajectories  
-- Redis for live buffers  
+### Fusion (sampling-based):  
+O(T · D²) for T samples and D drones
 
 ---
 
-# ⭐ Integration with Real UAV Systems
+## 3. Scaling to Large Number of UAVs
 
-### Can integrate with:
-- PX4 Mavlink telemetry  
-- ArduPilot  
-- FlytBase APIs  
-- DJI Mobile SDK  
+### 3.1 Vectorization
+Use NumPy vectorized distance computations:
 
-Through converters translating live GPS → Waypoint stream.
+- Reduce Python loops  
+- 10x improvement in large datasets
 
 ---
 
-# 🛰 Path to Full UTM System
+### 3.2 KD-Trees or BVH (Bounding Volume Hierarchies)
+To prune distance checks:
 
-### Additions needed:
-- Geofencing  
-- No-fly zones  
-- Wind/weather effects  
-- Flight rule enforcement  
-- Predictive conflict detection  
-- Terrain avoidance  
-
-This project already forms the foundation of such a system.
+- Only check drones likely to conflict  
+- Skip far-away drones entirely  
+- Reduces comparisons from D² to D log D
 
 ---
 
+### 3.3 Spatial Partitioning  
+Grid-based partitioning of airspace:
+
+- Reduces segment comparisons  
+- Can scale to **1000+ drones**
+
+---
+
+## 4. Real-Time System Scalability
+
+### Improvements for real-time UTM:
+
+- Event-driven updates (only recompute windows that change)  
+- Caching of partial results  
+- Incremental recomputation instead of full re-run  
+- Sliding time windows  
+
+---
+
+## 5. ROS2 Integration (Future Work)
+
+- Topics: `/mission_updates`, `/drone_state`, `/conflict_alert`
+- DDS-based QoS profiles  
+- Real-time constraints on latency  
+
+---
+
+## 6. Cloud or Distributed Simulation
+
+To scale to tens of thousands of drones:
+
+- Partition airspace sectors  
+- Assign each sector to a compute node  
+- Cross-sector coordination via boundary constraints  
+- Kubernetes for orchestration  
+
+---
+
+## 7. Visualization Scaling
+
+### Current:
+Matplotlib works well up to ~50 drones.
+
+### Future:
+- Use Plotly Dash for web interface  
+- Use Cesium for global-scale 3D  
+- GPU rendering for animation  
+
+---
+
+## 8. Conclusion
+
+The architecture is designed for extensibility. With moderate enhancements—vectorization, spatial partitioning, distributed simulation—the system can scale from 5–20 drones (current demo) to 1000+ drones for research-grade UTM applications.
